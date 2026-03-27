@@ -1,314 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard Pro</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍💼</text></svg>">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Dashboard with Order Status</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
-:root {
-  --primary: #111827;
-  --secondary: #1f2937;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --purple: #6366f1;
-  --pink: #f472b6;
-  --bg: #f0f4f8;
-  --white: #ffffff;
-  --shadow: 0 10px 25px rgba(0,0,0,0.1);
-  --shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
-body {display:flex; min-height:100vh; background:var(--bg); transition:all 0.3s ease;}
-.sidebar {width:260px; background:linear-gradient(180deg, var(--primary), var(--secondary)); color:var(--white); display:flex; flex-direction:column; box-shadow:var(--shadow);}
-.sidebar h2 {text-align:center; padding:25px 0; border-bottom:1px solid rgba(255,255,255,0.1); font-weight:700; font-size:24px; letter-spacing:1px;}
-.sidebar a {padding:18px 25px; text-decoration:none; color:var(--white); display:flex; align-items:center; gap:12px; transition:all 0.3s ease; cursor:pointer; position:relative;}
-.sidebar a:hover, .sidebar a.active {background:var(--secondary); transform:translateX(5px);}
-.sidebar a.active::before {content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--success);}
-.sidebar a i {width:20px;}
-
-.loading {position:relative; opacity:0.7; pointer-events:none;}
-.loading::after {
-  content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
-  width:20px; height:20px; border:2px solid rgba(255,255,255,0.3); 
-  border-top:2px solid var(--white); border-radius:50%; animation:spin 1s linear infinite;
-}
-@keyframes spin {to{transform:translate(-50%,-50%) rotate(360deg);}}
-
-.main-content {flex:1; padding:30px; overflow:auto;}
-.header {display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;}
-.header h1 {font-size:32px; font-weight:700; color:var(--primary); background:linear-gradient(135deg, var(--primary), var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;}
-.search-container {display:flex; gap:10px; align-items:center;}
-.search-input {padding:12px 20px; border:2px solid #e5e7eb; border-radius:12px; font-size:14px; transition:all 0.3s ease; min-width:300px;}
-.search-input:focus {outline:none; border-color:var(--success); box-shadow:var(--shadow);}
-
-.cards {display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:25px; margin-bottom:30px;}
-.card {padding:25px; border-radius:16px; box-shadow:var(--shadow); display:flex; align-items:center; gap:20px; color:var(--white); transition:all 0.3s ease; cursor:pointer; position:relative; overflow:hidden;}
-.card::before {content:''; position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, rgba(255,255,255,0.1), transparent); opacity:0; transition:opacity 0.3s;}
-.card:hover {transform:translateY(-10px) scale(1.02); box-shadow:var(--shadow-hover);}
-.card:hover::before {opacity:1;}
-.card i {font-size:40px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));}
-.card h3 {margin-bottom:8px; font-size:16px; opacity:0.95;}
-.card p {font-size:22px; font-weight:700;}
-
-.pending-card {background:linear-gradient(135deg, var(--warning), #fbbf24);}
-.completed-card {background:linear-gradient(135deg, var(--success), #059669);}
-.cancelled-card {background:linear-gradient(135deg, var(--danger), #dc2626);}
-.tickets-card {background:linear-gradient(135deg, var(--purple), #4f46e5);}
-.users-card {background:linear-gradient(135deg, var(--pink), #ec4899);}
-
-table {width:100%; border-collapse:collapse; background:var(--white); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); margin-top:20px;}
-th, td {padding:18px 20px; text-align:left;}
-th {background:linear-gradient(135deg, var(--primary), var(--secondary)); color:var(--white); font-weight:600; text-transform:uppercase; font-size:12px; letter-spacing:0.5px;}
-tr:nth-child(even) {background:#f8fafc;}
-tr:hover {background:#f1f5f9; transform:scale(1.01); transition:all 0.2s;}
-
-.status, .status-select {padding:8px 16px; border-radius:25px; font-weight:600; font-size:13px; border:none; cursor:pointer;}
-.status {color:var(--white);}
-.pending {background:var(--warning);}
-.completed {background:var(--success);}
-.cancelled {background:var(--danger);}
-.resolved {background:var(--purple);}
-
-.btn {padding:10px 20px; border:none; border-radius:10px; font-weight:600; cursor:pointer; transition:all 0.3s; font-size:14px;}
-.btn-primary {background:var(--success); color:var(--white);}
-.btn-danger {background:var(--danger); color:var(--white);}
-.btn:hover {transform:translateY(-2px); box-shadow:var(--shadow);}
-
-.search-input, .funds-input, .status-select {padding:12px; border:2px solid #e5e7eb; border-radius:10px; font-size:14px; transition:all 0.3s;}
-.search-input:focus, .funds-input:focus, .status-select:focus {outline:none; border-color:var(--success); box-shadow:var(--shadow);}
-
-.modal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; backdrop-filter:blur(5px);}
-.modal-content {position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--white); padding:40px; border-radius:20px; box-shadow:var(--shadow-hover); max-width:500px; width:90%;}
-.modal h3 {margin-bottom:20px; color:var(--primary); font-size:24px;}
-.modal-buttons {display:flex; gap:15px; justify-content:flex-end; margin-top:30px;}
-
-.page {display:none; animation:fadeIn 0.5s ease;}
-.page.active {display:block;}
-@keyframes fadeIn {from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);}}
-
-.toast {position:fixed; top:20px; right:20px; padding:16px 24px; border-radius:12px; color:var(--white); font-weight:600; transform:translateX(400px); transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index:1001; box-shadow:var(--shadow-hover);}
-.toast.show {transform:translateX(0);}
-.toast.success {background:linear-gradient(135deg, var(--success), #059669);}
-.toast.error {background:linear-gradient(135deg, var(--danger), #dc2626);}
-.toast.info {background:linear-gradient(135deg, var(--purple), #4f46e5);}
-
-@media(max-width:768px) {
-  body {flex-direction:column;}
-  .sidebar {width:100%; flex-direction:row; overflow-x:auto; padding:10px 0;}
-  .sidebar a {flex:1; text-align:center; padding:15px;}
-  .main-content {padding:20px 15px;}
-  .cards {grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px;}
-  .search-input {min-width:200px;}
-  .header h1 {font-size:24px;}
-}
+  *{margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif;}
+  body{display:flex; min-height:100vh; background:#f0f4f8;}
+  .sidebar{width:250px; background:#111827; color:white; display:flex; flex-direction:column;}
+  .sidebar h2{text-align:center; padding:20px 0; border-bottom:1px solid #444; font-weight:bold; font-size:22px;}
+  .sidebar a{padding:15px 20px; text-decoration:none; color:white; display:block; transition:background 0.2s; cursor:pointer;}
+  .sidebar a:hover, .sidebar a.active{background:#1f2937;}
+  .main-content{flex:1; padding:20px;}
+  .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;}
+  .header h1{font-size:28px; color:#111827;}
+  .cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:20px; margin-bottom:20px;}
+  .card{padding:20px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.1); display:flex; align-items:center; gap:15px; color:white; transition:transform 0.2s; cursor:pointer;}
+  .card:hover{transform:translateY(-5px);}
+  .card i{font-size:36px;}
+  .pending-card{background:#f59e0b;}
+  .completed-card{background:#10b981;}
+  .cancelled-card{background:#ef4444;}
+  .tickets-card{background:#6366f1;}
+  .users-card{background:#8b5cf6;}
+  .funds-card{background:#f472b6;}
+  .card h3{margin-bottom:5px;font-size:16px;}
+  .card p{font-size:18px;}
+  table{width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden; margin-top:10px;}
+  th, td{padding:12px 15px; text-align:left;}
+  th{background:#111827; color:white;}
+  tr:nth-child(even){background:#f9fafb;}
+  .status{padding:5px 10px; border-radius:5px; font-weight:bold; color:white;}
+  .pending{background:#f59e0b;}
+  .completed{background:#10b981;}
+  .cancelled{background:#ef4444;}
+  .resolved{background:#6366f1;}
+  .page{display:none;}
+  .page.active{display:block;}
+  button.add-funds{padding:5px 10px; background:#10b981; color:white; border:none; border-radius:5px; cursor:pointer;}
+  input.funds-input{width:70px; padding:3px; margin-right:5px; border-radius:4px; border:1px solid #ccc;}
+  select.status-select{padding:5px; border-radius:4px; border:1px solid #ccc;}
+  @media(max-width:768px){body{flex-direction:column;}.sidebar{width:100%; flex-direction:row; overflow-x:auto;}.sidebar a{flex:1; text-align:center;}.main-content{padding:10px;}.cards{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-  <h2><i class="fas fa-crown"></i> Admin Pro</h2>
-  <a class="active" data-page="dashboard" title="Dashboard">
-    <i class="fas fa-tachometer-alt"></i> Dashboard
-  </a>
-  <a data-page="orders" title="Orders">
-    <i class="fas fa-shopping-cart"></i> Orders
-  </a>
-  <a data-page="tickets" title="Tickets">
-    <i class="fas fa-ticket-alt"></i> Tickets
-  </a>
-  <a data-page="services" title="Services">
-    <i class="fas fa-cogs"></i> Services
-  </a>
-  <a data-page="users" title="Users">
-    <i class="fas fa-users"></i> Users
-  </a>
-  <a data-page="analytics" title="Analytics">
-    <i class="fas fa-chart-line"></i> Analytics
-  </a>
-  <a id="logout-btn" title="Logout">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </a>
+  <h2>Admin</h2>
+  <a class="active" data-page="dashboard" aria-label="Dashboard">Dashboard</a>
+  <a data-page="orders" aria-label="Orders">Orders</a>
+  <a data-page="tickets" aria-label="Tickets">Tickets</a>
+  <a data-page="services" aria-label="Services">Services</a>
+  <a data-page="users" aria-label="Users">Users</a>
+  <a aria-label="Logout">Logout</a>
 </div>
 
 <div class="main-content">
+
   <!-- Dashboard Page -->
-  <div id="dashboard" class="page active">
-    <div class="header">
-      <h1>Dashboard Overview</h1>
-      <div class="search-container">
-        <input type="text" class="search-input" id="global-search" placeholder="🔍 Search everything...">
-      </div>
-    </div>
+  <div id="dashboard" class="page active" aria-label="Dashboard">
+    <div class="header"><h1>Dashboard</h1></div>
     <div class="cards">
-      <div class="card pending-card" data-page="orders" data-filter="Pending">
+      <div class="card pending-card" data-page="orders" data-filter="Pending" aria-label="Pending Orders">
         <i class="fas fa-hourglass-half"></i>
-        <div><h3>Pending Orders</h3><p id="pending-count">0</p></div>
+        <div><h3>Pending Orders</h3><p id="pending-count" aria-live="polite">0</p></div>
       </div>
-      <div class="card completed-card" data-page="orders" data-filter="Completed">
+      <div class="card completed-card" data-page="orders" data-filter="Completed" aria-label="Completed Orders">
         <i class="fas fa-check-circle"></i>
-        <div><h3>Completed Orders</h3><p id="completed-count">0</p></div>
+        <div><h3>Completed Orders</h3><p id="completed-count" aria-live="polite">0</p></div>
       </div>
-      <div class="card cancelled-card" data-page="orders" data-filter="Cancelled">
+      <div class="card cancelled-card" data-page="orders" data-filter="Cancelled" aria-label="Cancelled Orders">
         <i class="fas fa-times-circle"></i>
-        <div><h3>Cancelled Orders</h3><p id="cancelled-count">0</p></div>
+        <div><h3>Cancelled Orders</h3><p id="cancelled-count" aria-live="polite">0</p></div>
       </div>
-      <div class="card tickets-card" data-page="tickets">
+      <div class="card tickets-card" data-page="tickets" aria-label="Tickets">
         <i class="fas fa-ticket-alt"></i>
-        <div><h3>Open Tickets</h3><p id="tickets-count">0</p></div>
+        <div><h3>Tickets</h3><p id="tickets-count" aria-live="polite">0</p></div>
       </div>
-      <div class="card users-card" data-page="users">
+      <div class="card users-card" data-page="users" aria-label="Users">
         <i class="fas fa-users"></i>
-        <div><h3>Total Users</h3><p id="users-count">0</p></div>
+        <div><h3>Users</h3><p id="users-count" aria-live="polite">0</p></div>
       </div>
     </div>
   </div>
 
   <!-- Orders Page -->
-  <div id="orders" class="page">
-    <div class="header">
-      <h1>Manage Orders</h1>
-      <div class="search-container">
-        <input type="text" class="search-input" id="orders-search" placeholder="🔍 Search orders...">
-        <select id="orders-filter" class="status-select">
-          <option value="">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Completed">Completed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-      </div>
-    </div>
-    <table id="orders-table">
-      <thead><tr><th>Order ID</th><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+  <div id="orders" class="page" aria-label="Orders Page">
+    <h1>Orders</h1>
+    <table id="orders-table" aria-label="Orders table">
+      <thead><tr><th>Order ID</th><th>Customer</th><th>Service</th><th>Status</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
 
   <!-- Tickets Page -->
-  <div id="tickets" class="page">
-    <div class="header">
-      <h1>Support Tickets</h1>
-      <input type="text" class="search-input" id="tickets-search" placeholder="🔍 Search tickets...">
-    </div>
-    <table id="tickets-table">
-      <thead><tr><th>Ticket ID</th><th>Customer</th><th>Subject</th><th>Priority</th><th>Status</th><th>Created</th></tr></thead>
+  <div id="tickets" class="page" aria-label="Tickets Page">
+    <h1>Tickets</h1>
+    <table id="tickets-table" aria-label="Tickets table">
+      <thead><tr><th>Ticket ID</th><th>Customer</th><th>Subject</th><th>Status</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
 
   <!-- Services Page -->
-  <div id="services" class="page">
-    <div class="header">
-      <h1>Services Management</h1>
-      <button class="btn btn-primary" onclick="addService()">+ Add Service</button>
-    </div>
-    <table id="services-table">
-      <thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead>
+  <div id="services" class="page" aria-label="Services Page">
+    <h1>Services</h1>
+    <table id="services-table" aria-label="Services table">
+      <thead><tr><th>Service ID</th><th>Name</th><th>Price</th><th>Available</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
 
   <!-- Users Page -->
-  <div id="users" class="page">
-    <div class="header">
-      <h1>User Management</h1>
-      <input type="text" class="search-input" id="users-search" placeholder="🔍 Search users...">
-    </div>
-    <table id="users-table">
-      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Balance</th><th>Orders</th><th>Action</th></tr></thead>
+  <div id="users" class="page" aria-label="Users Page">
+    <h1>Users</h1>
+    <table id="users-table" aria-label="Users table">
+      <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Balance</th><th>Action</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
 
-  <!-- Analytics Page -->
-  <div id="analytics" class="page">
-    <div class="header">
-      <h1>Analytics & Reports</h1>
-    </div>
-    <div style="background:var(--white); padding:30px; border-radius:16px; box-shadow:var(--shadow);">
-      <h3>📊 Revenue Analytics (Demo)</h3>
-      <canvas id="revenueChart" width="400" height="200" style="max-width:100%;"></canvas>
-      <div style="margin-top:20px;">
-        <button class="btn btn-primary" onclick="exportData('csv')">📥 Export CSV</button>
-        <button class="btn btn-primary" onclick="exportData('pdf')">📄 Export PDF</button>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- Modal -->
-<div id="confirmModal" class="modal">
-  <div class="modal-content">
-    <h3 id="modalTitle">Confirm Action</h3>
-    <p id="modalMessage"></p>
-    <div class="modal-buttons">
-      <button class="btn" id="modalCancel">Cancel</button>
-      <button class="btn btn-danger" id="modalConfirm">Confirm</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast Notification -->
-<div id="toast" class="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-class AdminDashboard {
-  constructor() {
-    this.orders = [];
-    this.tickets = [];
-    this.services = [];
-    this.users = [];
-    this.currentFilters = {};
-    this.init();
+  // Sample data
+  const orders=[
+    {id:'#101', customer:'John Doe', service:'Web Design', status:'Pending'},
+    {id:'#102', customer:'Jane Smith', service:'SEO Service', status:'Completed'},
+    {id:'#103', customer:'Mike Lee', service:'Graphic Design', status:'Cancelled'},
+  ];
+  const tickets=[
+    {id:'#T01', customer:'John Doe', subject:'Website not loading', status:'Pending'},
+    {id:'#T02', customer:'Jane Smith', subject:'Update service request', status:'Resolved'},
+  ];
+  const services=[
+    {id:'#S01', name:'Web Design', price:'$500', available:'Yes'},
+    {id:'#S02', name:'SEO Service', price:'$300', available:'Yes'},
+    {id:'#S03', name:'Graphic Design', price:'$400', available:'No'},
+  ];
+  const users=[
+    {id:'#U01', name:'John Doe', email:'john@example.com', balance:100},
+    {id:'#U02', name:'Jane Smith', email:'jane@example.com', balance:250},
+  ];
+
+  // Helper renderers
+  function renderOrders(filter){
+    const tbody=document.querySelector('#orders-table tbody');
+    tbody.innerHTML='';
+    orders.filter(o=>!filter||o.status===filter).forEach((o,index)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${o.id}</td>
+        <td>${o.customer}</td>
+        <td>${o.service}</td>
+        <td>
+          <select class="status-select" aria-label="Order status">
+            <option ${o.status==='Pending'?'selected':''}>Pending</option>
+            <option ${o.status==='Completed'?'selected':''}>Completed</option>
+            <option ${o.status==='Cancelled'?'selected':''}>Cancelled</option>
+          </select>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      // Change status event
+      tr.querySelector('.status-select').addEventListener('change', e=>{
+        orders[index].status=e.target.value;
+        updateDashboardCounts();
+      });
+    });
   }
 
-  init() {
-    this.loadData();
-    this.bindEvents();
-    this.renderAll();
-    this.updateDashboard();
-    this.setupCharts();
+  function renderTickets(){
+    const tbody=document.querySelector('#tickets-table tbody');
+    tbody.innerHTML='';
+    tickets.forEach(t=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${t.id}</td><td>${t.customer}</td><td>${t.subject}</td><td><span class="status ${t.status.toLowerCase()}">${t.status}</span></td>`;
+      tbody.appendChild(tr);
+    });
   }
 
-  loadData() {
-    const data = JSON.parse(localStorage.getItem('adminProData') || '{}');
-    this.orders = data.orders || this.getSampleOrders();
-    this.tickets = data.tickets || this.getSampleTickets();
-    this.services = data.services || this.getSampleServices();
-    this.users = data.users || this.getSampleUsers();
+  function renderServices(){
+    const tbody=document.querySelector('#services-table tbody');
+    tbody.innerHTML='';
+    services.forEach(s=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${s.id}</td><td>${s.name}</td><td>${s.price}</td><td>${s.available}</td>`;
+      tbody.appendChild(tr);
+    });
   }
 
-  saveData() {
-    localStorage.setItem('adminProData', JSON.stringify({
-      orders: this.orders,
-      tickets: this.tickets,
-      services: this.services,
-      users: this.users
-    }));
+  function renderUsers(){
+    const tbody=document.querySelector('#users-table tbody');
+    tbody.innerHTML='';
+    users.forEach((u,index)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${u.id}</td><td>${u.name}</td><td>${u.email}</td><td>$${u.balance}</td>
+        <td><input class="funds-input" type="number" placeholder="Amount" aria-label="Amount to add">
+        <button class="add-funds" aria-label="Add funds to user">Add</button></td>`;
+      tbody.appendChild(tr);
+      tr.querySelector('.add-funds').addEventListener('click', ()=>{
+        const amountInput=tr.querySelector('.funds-input');
+        const amount=parseFloat(amountInput.value);
+        if(amount>0){
+          users[index].balance+=amount;
+          renderUsers();
+          updateDashboardCounts();
+          alert(`$${amount} added to ${u.name}`);
+        } else {
+          alert('Enter a valid amount');
+        }
+      });
+    });
   }
 
-  getSampleOrders() {
-    return [
-      {id:'#ORD001', customer:'John Doe', service:'Premium Web Design', amount:500, status:'Pending', date:'2024-01-15'},
-      {id:'#ORD002', customer:'Jane Smith', service:'SEO Optimization', amount:300, status:'Completed', date:'2024-01-14'},
-      {id:'#ORD003', customer:'Mike Johnson', service:'Logo Design', amount:150, status:'Cancelled', date:'2024-01-13'},
-      {id:'#ORD004', customer:'Sarah Wilson', service:'WordPress Development', amount:800, status:'Pending', date:'2024-01-12'},
-    ];
+  // Dashboard counts
+  function updateDashboardCounts(){
+    document.getElementById('pending-count').textContent = orders.filter(o=>o.status==='Pending').length;
+    document.getElementById('completed-count').textContent = orders.filter(o=>o.status==='Completed').length;
+    document.getElementById('cancelled-count').textContent = orders.filter(o=>o.status==='Cancelled').length;
+    document.getElementById('tickets-count').textContent = tickets.length;
+    document.getElementById('users-count').textContent = users.length;
   }
 
-  getSampleTickets() {
-    return [
-      {id:'#T001', customer:'John Doe', subject:'Website not loading', priority:'High', status:'Pending', created:'2024-01-15'},
-      {id:'#T002', customer:'Jane Smith', subject:'Service update', priority:'Medium', status:'Resolved', created:'2024-01-14'},
-    ];
-  }
+  // Sidebar tab switching
+  const links=document.querySelectorAll('.sidebar a[data-page]');
+  const pages=document.querySelectorAll('.page');
+  links.forEach(link=>{
+    link.addEventListener('click',()=>{
+      links.forEach(l=>l.classList.remove('active'));
+      link.classList.add('active');
+      const pageId=link.getAttribute('data-page');
+      pages.forEach(p=>p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if(pageId==='orders'){renderOrders();}
+      if(pageId==='tickets'){renderTickets();}
+      if(pageId==='services'){renderServices();}
+      if(pageId==='users'){renderUsers();}
+    });
+  });
 
-  getSampleServices() {
-    return [
-      {id:'#S001', name:'Web Design', price:500, duration:'7 days', available:true},
-      {id:'#S002', name:'SEO Service', price:300, duration:'14 days', available:true},
-      {id:'#S003', name:'Logo Design', price
+  // Dashboard card clicks
+  const cards=document.querySelectorAll('.card[data-page]');
+  cards.forEach(card=>{
+    card.addEventListener('click',()=>{
+      const pageId=card.getAttribute('data-page');
+      const filter=card.getAttribute('data-filter');
+      // Navigate to the target page
+      const targetLink=document.querySelector(`.sidebar a[data-page="${pageId}"]`);
+      if(targetLink){
+        links.forEach(l=>l.classList.remove('active'));
+        targetLink.classList.add('active');
+      }
+      pages.forEach(p=>p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if(pageId==='orders'){renderOrders(filter);}
+      if(pageId==='tickets'){renderTickets();}
+      if(pageId==='users'){renderUsers();}
+    });
+  });
+
+  // Initialize counts and first render
+  document.addEventListener('DOMContentLoaded', ()=>{
+    updateDashboardCounts();
+    renderOrders(); // initial render for orders
+    renderTickets();
+    renderServices();
+    renderUsers();
+  });
+</script>
+</body>
+</html>
